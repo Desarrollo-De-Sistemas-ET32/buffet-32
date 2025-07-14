@@ -1,17 +1,21 @@
+// tsconfig.json
 {
   "compilerOptions": {
-    "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": true,
+    "strict": true, // Mantener en true es buena práctica para tipado estricto
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "bundler",
+    "moduleResolution": "bundler", // Recomendado para Next.js 13+
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "preserve", // ¡ESTA ES LA CLAVE para Next.js App Router!
     "incremental": true,
     "plugins": [
       {
@@ -19,9 +23,25 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
-    }
+      "@/*": [
+        "./src/*"
+      ], // Ajuste de paths para que apunten a src
+      // Puedes añadir más alias si usas la estructura src/
+      "@components/*": [
+        "./src/app/components/*"
+      ]
+    },
+    "target": "ES2017"
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts", // Importante para Next.js
+    "public/**/*.ts", // Incluye archivos TS dentro de public si los hubiera
+    "public/**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
