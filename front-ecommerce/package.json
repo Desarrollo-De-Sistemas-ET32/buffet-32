@@ -8,7 +8,7 @@
     "prettier:check": "prettier --check --ignore-unknown .",
     "test": "pnpm prettier:check",
     "db:generate": "drizzle-kit generate:pg",
-    "db:push": "drizzle-kit push:pg",
+    "db:push": "drizzle-kit push",
     "db:seed": "tsx --require dotenv/config lib/drizzle/seed.ts"
   },
   "dependencies": {
