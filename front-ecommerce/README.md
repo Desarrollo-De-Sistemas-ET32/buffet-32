@@ -70,6 +70,26 @@ Your app should now be running on [localhost:3000](http://localhost:3000/).
 1. Run `pnpm dev` to ensure everything is working correctly.
 </details>
 
+## Database Management (Drizzle)
+
+This project uses [Drizzle ORM](https://orm.drizzle.team/) to manage the PostgreSQL database schema and queries.
+
+### Setup
+
+1.  **Get your database connection string** from your provider (e.g., Supabase).
+2.  Create a `.env.local` file in the root of the project.
+3.  Add your connection string to the `.env.local` file:
+    ```
+    DATABASE_URL="postgres://user:password@host:port/db"
+    ```
+
+### Scripts
+
+The following scripts are available for managing the database schema:
+
+-   `pnpm db:generate`: This command inspects your schema file (`lib/drizzle/schema.ts`) and generates SQL migration files in the `lib/drizzle/migrations` directory. Run this command whenever you change your schema.
+-   `pnpm db:push`: This command applies any pending migrations to your database, updating its schema to match your application's schema.
+
 ## Vercel, Next.js Commerce, and Shopify Integration Guide
 
 You can use this comprehensive [integration guide](https://vercel.com/docs/integrations/ecommerce/shopify) with step-by-step instructions on how to configure Shopify as a headless CMS using Next.js Commerce as your headless Shopify storefront on Vercel.
