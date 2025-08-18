@@ -39,9 +39,9 @@ export default async function RootLayout({
               <div className="flex items-center">
                 <span>Open an account or sign in. 20% off everything.</span>
               </div>
-              <div className="hidden md:flex items-center space-x-4">
+              <div className="flex items-center space-x-4">
 
-                <a href="#" className="hidden md:block">Sign up</a>
+                <a href="#">Sign up</a>
                 <a href="#">Sign in</a>
               </div>
             </div>
