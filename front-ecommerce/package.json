@@ -9,7 +9,10 @@
     "test": "pnpm prettier:check",
     "db:generate": "drizzle-kit generate:pg",
     "db:push": "drizzle-kit push:pg",
-    "db:seed": "tsx --require dotenv/config lib/drizzle/seed.ts"
+    "db:seed": "tsx --require dotenv/config lib/drizzle/seed.ts",
+    "db:check": "tsx --require dotenv/config scripts/check-db.ts"
+    ,
+    "db:test-insert": "tsx --require dotenv/config scripts/test-insert-user.ts"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
@@ -19,6 +22,7 @@
     "drizzle-orm": "^0.44.4",
     "geist": "^1.3.1",
     "next": "15.3.0",
+    "postgres": "^3.4.7",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "sonner": "^2.0.1"
