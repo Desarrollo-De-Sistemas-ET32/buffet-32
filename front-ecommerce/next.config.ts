@@ -1,6 +1,7 @@
 export default {
   experimental: {
-    ppr: true,
+    // PPR requires Next.js canary; disable on stable
+    ppr: false,
     inlineCss: true,
     useCache: true
   },
@@ -11,6 +12,11 @@ export default {
         protocol: 'https',
         hostname: 'cdn.shopify.com',
         pathname: '/s/files/**'
+      },
+      {
+        protocol: 'https',
+        hostname: 'picsum.photos',
+        pathname: '/**'
       }
     ]
   }
