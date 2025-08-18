@@ -8,11 +8,8 @@
     "prettier:check": "prettier --check --ignore-unknown .",
     "test": "pnpm prettier:check",
     "db:generate": "drizzle-kit generate:pg",
-    "db:push": "drizzle-kit push:pg",
-    "db:seed": "tsx --require dotenv/config lib/drizzle/seed.ts",
-    "db:check": "tsx --require dotenv/config scripts/check-db.ts"
-    ,
-    "db:test-insert": "tsx --require dotenv/config scripts/test-insert-user.ts"
+    "db:push": "drizzle-kit push",
+    "db:seed": "tsx --require dotenv/config lib/drizzle/seed.ts"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
