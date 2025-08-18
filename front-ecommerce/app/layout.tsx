@@ -3,7 +3,7 @@ import { Navbar } from 'components/layout/navbar';
 import { WelcomeToast } from 'components/welcome-toast';
 import { GeistSans } from 'geist/font/sans';
 import { getCart } from 'lib/shopify';
-import { ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { Toaster } from 'sonner';
 import './globals.css';
 import { baseUrl } from 'lib/utils';
@@ -34,6 +34,18 @@ export default async function RootLayout({
     <html lang="en" className={GeistSans.variable}>
       <body className="bg-neutral-50 text-black selection:bg-teal-300 dark:bg-neutral-900 dark:text-white dark:selection:bg-pink-500 dark:selection:text-white">
         <CartProvider cartPromise={cart}>
+          <div className="bg-neutral-800 text-neutral-300 text-sm">
+            <div className="container mx-auto flex items-center justify-center md:justify-between p-2">
+              <div className="flex items-center">
+                <span>Open an account or sign in. 20% off everything.</span>
+              </div>
+              <div className="hidden md:flex items-center space-x-4">
+
+                <a href="#" className="hidden md:block">Sign up</a>
+                <a href="#">Sign in</a>
+              </div>
+            </div>
+          </div>
           <Navbar />
           <main>
             {children}
