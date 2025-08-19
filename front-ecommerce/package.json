@@ -9,7 +9,11 @@
     "test": "pnpm prettier:check",
     "db:generate": "drizzle-kit generate:pg",
     "db:push": "drizzle-kit push",
-    "db:seed": "tsx --require dotenv/config lib/drizzle/seed.ts"
+    "db:migrate": "tsx --require dotenv/config scripts/migrate.ts",
+    "db:seed": "tsx --require dotenv/config lib/drizzle/seed.ts",
+    "db:studio": "drizzle-kit studio",
+    "db:studio:4984": "drizzle-kit studio --host 127.0.0.1 --port 4984",
+    "db:studio:4985": "drizzle-kit studio --host 127.0.0.1 --port 4985"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
