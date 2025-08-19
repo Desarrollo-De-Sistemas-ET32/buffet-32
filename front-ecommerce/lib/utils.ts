@@ -33,11 +33,11 @@ export const validateEnvironmentVariables = () => {
   });
 
   if (missingEnvironmentVariables.length) {
-    throw new Error(
-      `The following environment variables are missing. Your site will not work without them. Read more: https://vercel.com/docs/integrations/shopify#configure-environment-variables\n\n${missingEnvironmentVariables.join(
-        '\n'
-      )}\n`
+    // In mock mode we don't require Shopify envs; just warn.
+    console.warn(
+      `Skipping Shopify env validation (mock mode). Missing: \n${missingEnvironmentVariables.join('\n')}`
     );
+    return;
   }
 
   if (
