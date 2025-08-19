@@ -90,6 +90,34 @@ The following scripts are available for managing the database schema:
 -   `pnpm db:generate`: This command inspects your schema file (`lib/drizzle/schema.ts`) and generates SQL migration files in the `lib/drizzle/migrations` directory. Run this command whenever you change your schema.
 -   `pnpm db:push`: This command applies any pending migrations to your database, updating its schema to match your application's schema.
 
+### Supabase (Postgres) Setup
+
+If you are using Supabase Postgres, SSL/TLS is required. This project enforces SSL at the client level and expects a valid connection string in your environment.
+
+- Environment variable: set `DATABASE_URL` with `sslmode=require`.
+  - Pooled (recommended): `postgresql://USER:PASS@YOUR_PROJECT_ID.pooler.supabase.com:6543/postgres?sslmode=require`
+  - Direct: `postgresql://USER:PASS@YOUR_PROJECT_ID.supabase.co:5432/postgres?sslmode=require`
+- Client config: `lib/drizzle/index.ts` forces SSL (`ssl: 'require'`) and throws if `DATABASE_URL` is missing.
+
+Verification scripts (safe):
+
+- `pnpm db:check`: checks connectivity with `SELECT 1`.
+- `pnpm db:test-insert`: creates the `users` table if missing, inserts/selects a test row, and cleans it up.
+- Optional: `pnpm db:seed` to seed example `users`.
+
+Local API test:
+
+1. Run `pnpm dev`.
+2. Send a POST to `http://localhost:3000/api/add-user` with:
+   `{"fullName":"CLI Test","phone":"555-CLI"}`
+3. You should get back the inserted user as JSON.
+
+Troubleshooting:
+
+- Connection errors: ensure `?sslmode=require` is present or verify your credentials/host.
+- Table missing: run `pnpm db:test-insert` (creates `users`) or manage via Drizzle migrations (`pnpm db:push`).
+- TS path alias: if imports like `@/lib/drizzle` fail, add to `tsconfig.json` under `compilerOptions`: `"paths": { "@/*": ["./*"] }`.
+
 ## Vercel, Next.js Commerce, and Shopify Integration Guide
 
 You can use this comprehensive [integration guide](https://vercel.com/docs/integrations/ecommerce/shopify) with step-by-step instructions on how to configure Shopify as a headless CMS using Next.js Commerce as your headless Shopify storefront on Vercel.
