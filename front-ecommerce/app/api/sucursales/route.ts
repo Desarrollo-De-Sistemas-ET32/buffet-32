@@ -3,7 +3,6 @@ import { db } from 'lib/drizzle'; // Adjust the import path as necessary
 import { sucursales } from 'lib/drizzle/schema'; // Adjust the import path as necessary
 import { eq } from 'drizzle-orm';
 
-// GET handler to fetch all branches
 export async function GET() {
   try {
     const allSucursales = await db.select().from(sucursales);
@@ -14,7 +13,6 @@ export async function GET() {
   }
 }
 
-// POST handler to add a new branch
 export async function POST(request: Request) {
   try {
     const { nombre, direccion, telefono } = await request.json();
