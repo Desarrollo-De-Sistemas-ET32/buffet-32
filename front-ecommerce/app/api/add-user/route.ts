@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/drizzle';
-import { users } from '@/lib/drizzle/schema';
+import { db } from 'lib/drizzle';
+import { users } from 'lib/drizzle/schema';
 
 export async function POST(request: Request) {
   try {

@@ -16,7 +16,6 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const newProductData = await req.json();
-    // Basic validation (you should add more robust validation)
     if (!newProductData || !newProductData.name || !newProductData.price) {
       return NextResponse.json({ error: 'Missing required product data' }, { status: 400 });
     }
