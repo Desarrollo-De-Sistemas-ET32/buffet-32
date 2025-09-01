@@ -1,13 +1,11 @@
 import { pgTable, serial, text, varchar, integer, decimal, date } from "drizzle-orm/pg-core";
 
-// Tabla 'users'
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
   fullName: text('full_name'),
   phone: varchar('phone', { length: 256 }),
 });
 
-// Tabla 'sucursales'
 export const sucursales = pgTable('sucursales', {
   sucursal_id: serial('sucursal_id').primaryKey(),
   nombre: varchar('nombre', { length: 255 }),
@@ -33,6 +31,7 @@ export const ordenes = pgTable('ordenes', {
   cliente_id: integer('cliente_id').references(() => clientes.cliente_id),
   fecha_orden: date('fecha_orden'),
   estado: varchar('estado', { length: 50 }),
+  total: decimal('total', { precision: 10, scale: 2 }),
 });
 
 export const productos = pgTable('productos', {
