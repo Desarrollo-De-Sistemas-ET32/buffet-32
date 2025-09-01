@@ -1,32 +1,124 @@
-// Mocked implementation of the Shopify API for local/front-end development.
+
 import { TAGS } from 'lib/constants';
+import type { Cart, Collection, Menu, Page, Product } from './types';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
-import type { Cart, Collection, Menu, Page, Product } from './types';
-import {
-  carts,
-  cloneCart,
-  createEmptyCart,
-  findProductByHandle,
-  getCollectionHandlesProducts,
-  mockCollections,
-  mockMenu,
-  mockPages,
-  mockProducts,
-  recalcCart,
-  variantToProduct
-} from './mock-data';
+
+// Mock data provider replacing Shopify integration.
+
+const placeholderImage = {
+  url: '/placeholder.svg',
+  altText: 'Placeholder',
+  width: 512,
+  height: 512
+};
+
+const mockProducts: Product[] = [
+  {
+    id: 'prod_1',
+    handle: 'producto-1',
+    availableForSale: true,
+    title: 'Producto 1',
+    description: 'Descripcion del producto 1',
+    descriptionHtml: '<p>Descripcion del producto 1</p>',
+    options: [],
+    priceRange: {
+      maxVariantPrice: { amount: '25.00', currencyCode: 'USD' },
+      minVariantPrice: { amount: '25.00', currencyCode: 'USD' }
+    },
+    variants: [
+      {
+        id: 'prod_1_v1',
+        title: 'Default',
+        availableForSale: true,
+        selectedOptions: [],
+        price: { amount: '25.00', currencyCode: 'USD' }
+      }
+    ],
+    featuredImage: placeholderImage,
+    images: [placeholderImage],
+    seo: { title: 'Producto 1', description: 'Producto 1' },
+    tags: [],
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'prod_2',
+    handle: 'producto-2',
+    availableForSale: true,
+    title: 'Producto 2',
+    description: 'Descripcion del producto 2',
+    descriptionHtml: '<p>Descripcion del producto 2</p>',
+    options: [],
+    priceRange: {
+      maxVariantPrice: { amount: '40.00', currencyCode: 'USD' },
+      minVariantPrice: { amount: '40.00', currencyCode: 'USD' }
+    },
+    variants: [
+      {
+        id: 'prod_2_v1',
+        title: 'Default',
+        availableForSale: true,
+        selectedOptions: [],
+        price: { amount: '40.00', currencyCode: 'USD' }
+      }
+    ],
+    featuredImage: placeholderImage,
+    images: [placeholderImage],
+    seo: { title: 'Producto 2', description: 'Producto 2' },
+    tags: [],
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'prod_3',
+    handle: 'producto-3',
+    availableForSale: false,
+    title: 'Producto 3',
+    description: 'Descripcion del producto 3',
+    descriptionHtml: '<p>Descripcion del producto 3</p>',
+    options: [],
+    priceRange: {
+      maxVariantPrice: { amount: '15.00', currencyCode: 'USD' },
+      minVariantPrice: { amount: '15.00', currencyCode: 'USD' }
+    },
+    variants: [
+      {
+        id: 'prod_3_v1',
+        title: 'Default',
+        availableForSale: false,
+        selectedOptions: [],
+        price: { amount: '15.00', currencyCode: 'USD' }
+      }
+    ],
+    featuredImage: placeholderImage,
+    images: [placeholderImage],
+    seo: { title: 'Producto 3', description: 'Producto 3' },
+    tags: [],
+    updatedAt: new Date().toISOString()
+  }
+];
+
+const mockCollections: Record<string, string[]> = {
+  'hidden-homepage-featured-items': ['prod_1', 'prod_2', 'prod_3'],
+  'hidden-homepage-carousel': ['prod_2', 'prod_3', 'prod_1']
+};
 
 export async function createCart(): Promise<Cart> {
-  const id = (crypto as any).randomUUID?.() || `cart_${Math.random().toString(36).slice(2)}`;
-  const cart = createEmptyCart();
-  cart.id = id;
-  carts[id] = cart;
-  return cloneCart(cart);
+  return {
+    id: 'mock-cart',
+    checkoutUrl: '#',
+    totalQuantity: 0,
+    lines: [],
+    cost: {
+      subtotalAmount: { amount: '0', currencyCode: 'USD' },
+      totalAmount: { amount: '0', currencyCode: 'USD' },
+      totalTaxAmount: { amount: '0', currencyCode: 'USD' }
+    }
+  };
+
 }
 
 export async function addToCart(
-  lines: { merchandiseId: string; quantity: number }[]
+  _lines: { merchandiseId: string; quantity: number }[]
 ): Promise<Cart> {
   const cartId = (await cookies()).get('cartId')?.value!;
   const cart = carts[cartId] || createEmptyCart();
@@ -76,10 +168,11 @@ export async function removeFromCart(lineIds: string[]): Promise<Cart> {
   cart.lines = cart.lines.filter((l) => !lineIds.includes(l.id || ''));
   recalcCart(cart);
   return cloneCart(cart);
+
 }
 
 export async function updateCart(
-  lines: { id: string; merchandiseId: string; quantity: number }[]
+  _lines: { id: string; merchandiseId: string; quantity: number }[]
 ): Promise<Cart> {
   const cartId = (await cookies()).get('cartId')?.value!;
   const cart = carts[cartId];
@@ -99,6 +192,7 @@ export async function updateCart(
   }
   recalcCart(cart);
   return cloneCart(cart);
+
 }
 
 export async function getCart(): Promise<Cart | undefined> {
@@ -117,9 +211,7 @@ export async function getCollection(
 }
 
 export async function getCollectionProducts({
-  collection,
-  reverse,
-  sortKey
+  collection
 }: {
   collection: string;
   reverse?: boolean;
@@ -160,19 +252,7 @@ export async function getProduct(handle: string): Promise<Product | undefined> {
 export async function getProductRecommendations(
   productId: string
 ): Promise<Product[]> {
-  const products = mockProducts.filter((p) => p.id !== productId);
-  return products.map((p) => ({ ...p }));
-}
 
-export async function getProducts({
-  query,
-  reverse,
-  sortKey
-}: {
-  query?: string;
-  reverse?: boolean;
-  sortKey?: string;
-}): Promise<Product[]> {
   let products = mockProducts;
   if (query) {
     const q = query.toLowerCase();
@@ -198,5 +278,15 @@ function sortProducts(products: Product[], sortKey?: string, reverse?: boolean):
   }
   if (reverse) arr.reverse();
   return arr;
+
+  if (!query) return mockProducts;
+  const q = query.toLowerCase();
+  return mockProducts.filter((p) => p.title.toLowerCase().includes(q));
+}
+
+export async function revalidate(_req: NextRequest): Promise<NextResponse> {
+  // No external provider, just acknowledge.
+  return NextResponse.json({ status: 200, revalidated: true, now: Date.now(), tags: TAGS });
+
 }
 
