@@ -31,7 +31,6 @@ export const ordenes = pgTable('ordenes', {
   cliente_id: integer('cliente_id').references(() => clientes.cliente_id),
   fecha_orden: date('fecha_orden'),
   estado: varchar('estado', { length: 50 }),
-  total: decimal('total', { precision: 10, scale: 2 }),
 });
 
 export const productos = pgTable('productos', {
