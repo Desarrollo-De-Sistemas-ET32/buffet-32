@@ -1,5 +1,5 @@
 import OpengraphImage from 'components/opengraph-image';
-import { getCollection } from 'lib/shopify';
+import { getCollection } from 'lib/shop-mock';
 
 export default async function Image({
   params

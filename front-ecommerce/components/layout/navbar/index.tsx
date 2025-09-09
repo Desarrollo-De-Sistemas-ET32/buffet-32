@@ -1,16 +1,18 @@
+"use client";
+
 import CartModal from 'components/cart/modal';
 import LogoSquare from 'components/logo-square';
-import { getMenu } from 'lib/shopify';
+import { getMenu } from 'lib/menu';
 import { Menu } from 'lib/shopify/types';
 import Link from 'next/link';
-import { Suspense } from 'react';
+import { Suspense, useMemo } from 'react';
 import MobileMenu from './mobile-menu';
 import Search, { SearchSkeleton } from './search';
 
 const { SITE_NAME } = process.env;
 
-export async function Navbar() {
-  const menu = await getMenu('next-js-frontend-header-menu');
+export function Navbar() {
+  const menu = useMemo(() => getMenu('next-js-frontend-header-menu'), []);
 
   return (
     <nav className="relative flex items-center justify-between p-4 lg:px-6">
