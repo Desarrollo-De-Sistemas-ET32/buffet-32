@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { db } from 'lib/drizzle'; // Adjust the import path as necessary
-import { sucursales } from 'lib/drizzle/schema'; // Adjust the import path as necessary
+import { db } from '@/lib/drizzle';
+import { sucursales } from '@/lib/drizzle/schema';
 import { eq } from 'drizzle-orm';
 
 export async function GET() {

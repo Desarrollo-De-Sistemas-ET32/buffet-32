@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from 'lib/drizzle';
-import { ordenes } from 'lib/drizzle/schema';
+import { db } from '@/lib/drizzle';
+import { ordenes } from '@/lib/drizzle/schema';
 
 export async function POST(request: NextRequest) {
   try {

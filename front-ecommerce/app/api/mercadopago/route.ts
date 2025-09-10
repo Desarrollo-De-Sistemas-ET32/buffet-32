@@ -1,53 +1,63 @@
+import { mercadopago } from "../../api";
+import * as schema from "../../../lib/drizzle/schema"; // Única importación del schema
 import { Payment } from "mercadopago";
-import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
-import { mercadopago } from "@/app/api";
-import { db } from "@/lib/drizzle";
-import { ordenes } from "@/lib/drizzle/schema";
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { Pool } from 'pg';
+
+// 1. Conexión a la Base de Datos
+if (!process.env.DATABASE_URL) {
+  throw new Error('DATABASE_URL is not set in environment variables');
+}
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+});
+// Drizzle usa el objeto 'schema' para entender la DB
+const db = drizzle(pool, { schema });
 
 export async function POST(request: Request) {
-  // Obtenemos el cuerpo de la petición que incluye información sobre la notificación
-  const body: { data: { id: string } } = await request.json();
+  const body = await request.json();
 
-  // Validamos que el ID del pago exista
-  if (!body.data.id) {
-    return NextResponse.json({ error: "Payment ID not provided" }, { status: 400 });
-  }
+  if (body.type === "payment") {
+    try {
+      const paymentId = body.data.id as string;
+      const payment = await new Payment(mercadopago).get({ id: paymentId });
 
-  try {
-    // Obtenemos el pago usando el ID
-    const payment = await new Payment(mercadopago).get({ id: body.data.id });
+      if (payment && payment.metadata) {
+        const metadata = payment.metadata as { cliente_id: any; items: string; };
+        const clienteId = Number(metadata.cliente_id);
+        const itemsFromMetadata = JSON.parse(metadata.items);
 
-    // Si el pago existe y fue aprobado, creamos la orden en la base de datos
-    if (payment && payment.status === "approved") {
-      // Asumimos que estás pasando 'cliente_id' en los metadatos al crear la preferencia de pago.
-      const clienteId = payment.metadata?.cliente_id;
+        // CORRECCIÓN: Usar schema.ordenes para eliminar la ambigüedad de tipos
+        const [newOrder] = await db.insert(schema.ordenes).values({
+          cliente_id: clienteId,
+          estado: "paid",
+          fecha_orden: new Date(),
+        }).returning({ orden_id: schema.ordenes.orden_id });
 
-      if (!clienteId) {
-        console.error("Error: No se encontró 'cliente_id' en los metadatos del pago de MercadoPago. ID de pago:", payment.id);
-        // Respondemos 200 a MercadoPago para que no reintente, pero registramos el error.
-        return new Response(null, { status: 200 });
+        if (newOrder && newOrder.orden_id) {
+          for (const item of itemsFromMetadata) {
+            // CORRECCIÓN: Usar schema.ordenes_productos
+            await db.insert(schema.ordenes_productos).values({
+              orden_id: newOrder.orden_id,
+              producto_id: Number(item.id),
+              cantidad: Number(item.quantity),
+            });
+          }
+          return NextResponse.json({ success: true });
+        } else {
+          throw new Error("Failed to create order or retrieve its ID.");
+        }
+      } else {
+        throw new Error("Payment metadata is missing or invalid.");
       }
-
-      // Creamos el objeto para la nueva orden
-      const newOrder = {
-        cliente_id: Number(clienteId),
-        fecha_orden: new Date().toISOString().split('T')[0], // Formato YYYY-MM-DD
-        estado: payment.status,
-      };
-
-      // Insertamos la nueva orden en la base de datos
-      await db.insert(ordenes).values(newOrder);
-
-      // Revalidamos la página de inicio para mostrar los datos actualizados
-      revalidatePath("/");
+    } catch (error) {
+      console.error("Error processing payment webhook:", error);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error processing payment";
+      return NextResponse.json({ success: false, message: errorMessage }, { status: 500 });
     }
-
-    // Respondemos con un estado 200 para indicarle que la notificación fue recibida
-    return new Response(null, { status: 200 });
-
-  } catch (error) {
-    console.error('Error procesando el webhook de MercadoPago:', error);
-    return NextResponse.json({ error: "Failed to process webhook" }, { status: 500 });
   }
+
+  return NextResponse.json({ success: true });
 }

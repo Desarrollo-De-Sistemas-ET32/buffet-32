@@ -1,37 +1,36 @@
-import {redirect} from "next/navigation";
-import api from "app/api";
+import {revalidatePath} from "next/cache";
+import MessageForm from "./message-form";
+import api from "@/api";
 
-// Queremos que esta página sea estática, nos encargaremos de revalidar los datos cuando agreguemos un nuevo mensaje
-export const dynamic = "force-static";
+// Queremos que esta página sea dinámica para siempre poder ver la información actualizada del usuario
+export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
+  // Obtenemos los mensajes de la base de datos
   const messages = await api.message.list();
 
-  async function add(formData: FormData) {
+  async function add(
+    message: string,
+    data: {amount: number; email: string; installments: number; token: string},
+  ) {
     "use server";
 
-    const message = formData.get("text") as string;
-    const url = await api.message.submit(message);
+    // Creamos el pago con los datos del formulario
+    const payment = await api.message.buy(data);
 
-    redirect(url);
+    // Añadimos el mensaje a la lista
+    await api.message.add({text: message, id: payment.id!});
+
+    // Revalidamos la ruta para poder ver el formulario de agregar mensaje
+    revalidatePath("/");
   }
 
   return (
     <section className="grid gap-8">
-      <form action={add} className="grid gap-2">
-        <textarea
-          className="border-2 border-blue-400 p-2"
-          name="text"
-          placeholder="Hola perro"
-          rows={3}
-        />
-        <button className="rounded bg-blue-400 p-2" type="submit">
-          Enviar
-        </button>
-      </form>
-      <ul className="grid gap-2">
+      <MessageForm amount={100} onSubmitAction={add} />
+      <ul>
         {messages.map((message) => (
-          <li key={message.id} className="rounded bg-blue-400/10 p-4">
+          <li key={message.id}>
             {message.text}
           </li>
         ))}
