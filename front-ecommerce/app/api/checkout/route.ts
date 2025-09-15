@@ -1,4 +1,4 @@
-import { mercadopago } from "app/api";
+import { client } from "app/api";
 import * as schema from "../../../lib/drizzle/schema";
 import { Payment } from "mercadopago";
 import { NextResponse } from "next/server";
@@ -22,7 +22,7 @@ export async function POST(request: Request) {
   if (body.type === "payment") {
     try {
       const paymentId = body.data.id as string;
-      const payment = await new Payment(mercadopago).get({ id: paymentId });
+      const payment = await new Payment(client).get({ id: paymentId });
 
       if (payment && payment.metadata) {
         const metadata = payment.metadata as { cliente_id: any; items: string; };
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
         const [newOrder] = await db.insert(schema.ordenes).values({
           cliente_id: clienteId,
           estado: "paid",
-          fecha_orden: new Date(),
+          fecha_orden: new Date().toISOString().split('T')[0]
         }).returning({ orden_id: schema.ordenes.orden_id });
 
         if (newOrder && newOrder.orden_id) {

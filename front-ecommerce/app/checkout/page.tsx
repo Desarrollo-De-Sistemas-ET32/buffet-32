@@ -1,6 +1,6 @@
 import {revalidatePath} from "next/cache";
 import MessageForm from "./message-form";
-import api from "@/api";
+import api from "app/api";
 
 // Queremos que esta página sea dinámica para siempre poder ver la información actualizada del usuario
 export const dynamic = "force-dynamic";
