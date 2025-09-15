@@ -1,5 +1,5 @@
-import { mercadopago } from "../../api";
-import * as schema from "../../../lib/drizzle/schema"; // Única importación del schema
+import { mercadopago } from "app/api";
+import * as schema from "../../../lib/drizzle/schema";
 import { Payment } from "mercadopago";
 import { NextResponse } from "next/server";
 import { drizzle } from 'drizzle-orm/node-postgres';
