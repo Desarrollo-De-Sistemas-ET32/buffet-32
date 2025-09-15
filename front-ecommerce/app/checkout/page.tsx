@@ -1,5 +1,5 @@
-import {revalidatePath} from "next/cache";
-import MessageForm from "./message-form";
+import { revalidatePath } from "next/cache";
+import MessageForm from "../message-form";
 import api from "app/api";
 
 // Queremos que esta página sea dinámica para siempre poder ver la información actualizada del usuario
@@ -11,7 +11,7 @@ export default async function HomePage() {
 
   async function add(
     message: string,
-    data: {amount: number; email: string; installments: number; token: string},
+    data: { amount: number; email: string; installments: number; token: string },
   ) {
     "use server";
 
@@ -19,7 +19,7 @@ export default async function HomePage() {
     const payment = await api.message.buy(data);
 
     // Añadimos el mensaje a la lista
-    await api.message.add({text: message, id: payment.id!});
+    await api.message.add({ text: message, id: payment.id! });
 
     // Revalidamos la ruta para poder ver el formulario de agregar mensaje
     revalidatePath("/");
@@ -29,7 +29,7 @@ export default async function HomePage() {
     <section className="grid gap-8">
       <MessageForm amount={100} onSubmitAction={add} />
       <ul>
-        {messages.map((message) => (
+        {messages.map((message: { id: number; text: string }) => (
           <li key={message.id}>
             {message.text}
           </li>
