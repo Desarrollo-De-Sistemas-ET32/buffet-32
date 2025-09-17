@@ -10,6 +10,9 @@ const client = new MercadoPagoConfig({
 });
 
 export async function POST(req: NextRequest) {
+  console.log('--- DEBUGGING MP_ACCESS_TOKEN ---');
+  console.log('Access Token Used:', process.env.MP_ACCESS_TOKEN);
+  console.log('---------------------------------');
   try {
     const { cart } = (await req.json()) as { cart: Cart };
 
@@ -19,6 +22,10 @@ export async function POST(req: NextRequest) {
 
     const lines: CartItem[] = cart.lines;
 
+    // --- MOCK DE BASE DE DATOS ---
+    // Se simula la creación de la orden para evitar el error de la base de datos.
+    const newOrder = { orderId: Date.now() }; // Usamos un timestamp como ID de orden falso.
+    /*
     const newOrder = await (db as NodePgDatabase<typeof schema>).transaction(async (tx) => {
       const [insertedOrder] = await tx
         .insert(schema.ordenes)
@@ -45,6 +52,7 @@ export async function POST(req: NextRequest) {
 
       return { orderId };
     });
+    */
 
     if (!newOrder?.orderId) {
       throw new Error('La transacción no devolvió un ID de orden.');
@@ -69,9 +77,9 @@ export async function POST(req: NextRequest) {
         items: preferenceItems,
         external_reference: newOrder.orderId.toString(),
         back_urls: {
-          success: `${req.nextUrl.origin}/checkout/success?order_id=${newOrder.orderId}`,
-          failure: `${req.nextUrl.origin}/checkout/failure`,
-          pending: `${req.nextUrl.origin}/checkout/pending`,
+          success: `https://TUNNEL_URL/checkout/success?order_id=${newOrder.orderId}`,
+          failure: `https://TUNNEL_URL/checkout/failure`,
+          pending: `https://TUNNEL_URL/checkout/pending`
         },
         auto_return: 'approved',
       },
