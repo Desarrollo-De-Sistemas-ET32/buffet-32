@@ -5,7 +5,6 @@ import { NextResponse } from "next/server";
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 
-// 1. Conexión a la Base de Datos
 if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL is not set in environment variables');
 }
