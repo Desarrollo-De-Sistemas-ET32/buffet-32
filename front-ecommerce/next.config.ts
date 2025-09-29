@@ -3,7 +3,9 @@ export default {
     // PPR requires Next.js canary; disable on stable
     ppr: false,
     inlineCss: true,
-    useCache: true
+    useCache: true,
+    // Allow dev assets to be requested from your ngrok tunnel origin
+    allowedDevOrigins: ['https://9008f9422ac9.ngrok-free.app']
   },
   images: {
     formats: ['image/avif', 'image/webp'],
@@ -19,11 +21,5 @@ export default {
         pathname: '/**'
       }
     ]
-  images: {
-    formats: ['image/avif', 'image/webp']
-  },
-  experimental: {
-    // Allow dev assets to be requested from your ngrok tunnel origin
-    allowedDevOrigins: ['https://9008f9422ac9.ngrok-free.app']
   }
 };
