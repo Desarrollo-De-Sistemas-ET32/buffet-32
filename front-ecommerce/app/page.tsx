@@ -1,33 +1,7 @@
 import Grid from 'components/grid';
-import { GridTileImage } from 'components/grid/tile';
-import { getCollectionProducts } from 'lib/shopify';
+import Link from 'next/link'; 
+import { getCollectionProducts, getCollections } from 'lib/shopify'; 
 import type { Product } from 'lib/shopify/types';
-import Link from 'next/link';
-import Image from 'next/image';
-
-function ProductGridItem({ item }: { item: Product }) {
-  return (
-    <Grid.Item className="animate-fadeIn">
-      <Link
-        className="relative block aspect-square h-full w-full"
-        href={`/product/${item.handle}`}
-        prefetch={true}
-      >
-        <GridTileImage
-          src={item.featuredImage.url}
-          fill
-          sizes="(min-width: 768px) 33vw, 100vw"
-          alt={item.title}
-          label={{
-            title: item.title as string,
-            amount: item.priceRange.maxVariantPrice.amount,
-            currencyCode: item.priceRange.maxVariantPrice.currencyCode
-          }}
-        />
-      </Link>
-    </Grid.Item>
-  );
-}
 
 export const metadata = {
   description:
@@ -38,168 +12,150 @@ export const metadata = {
 };
 
 export default async function HomePage() {
+  
+  // Cargar categorías y productos
+  const popularCategories = await getCollections();
+  const popularProducts = await getCollectionProducts({
+    collection: 'popular-products', 
+    sortKey: 'BEST_SELLING',
+    reverse: false
+  });
+
+  // --- Datos Mock de la Estructura de la Home ---
+  // NOTA: Usamos este array de categorías por simplicidad del mock y porque coincide con el layout de 12 círculos.
   const categories = [
-    { name: 'Fresh Fruit', icon: '/placeholder.svg' },
-    { name: 'Fresh Vegetables', icon: '/placeholder.svg' },
-    { name: 'Meat & Fish', icon: '/placeholder.svg' },
-    { name: 'Snacks', icon: '/placeholder.svg' },
-    { name: 'Beverages', icon: '/placeholder.svg' },
-    { name: 'Beauty & Health', icon: '/placeholder.svg' },
-    { name: 'Bread & Bakery', icon: '/placeholder.svg' },
-    { name: 'Baking Needs', icon: '/placeholder.svg' },
-    { name: 'Cooking', icon: '/placeholder.svg' },
-    { name: 'Diabetic Food', icon: '/placeholder.svg' },
-    { name: 'Dish Detergents', icon: '/placeholder.svg' },
-    { name: 'Oil', icon: '/placeholder.svg' }
+    { name: 'Fresh Fruit', icon: '/placeholder.svg', handle: 'fresh-fruit' },
+    { name: 'Fresh Vegetables', icon: '/placeholder.svg', handle: 'fresh-vegetables' },
+    { name: 'Meat & Fish', icon: '/placeholder.svg', handle: 'meat-fish' },
+    { name: 'Snacks', icon: '/placeholder.svg', handle: 'snacks' },
+    { name: 'Beverages', icon: '/placeholder.svg', handle: 'beverages' },
+    { name: 'Beauty & Health', icon: '/placeholder.svg', handle: 'beauty-health' },
+    { name: 'Bread & Bakery', icon: '/placeholder.svg', handle: 'bread-bakery' },
+    { name: 'Baking Needs', icon: '/placeholder.svg', handle: 'baking-needs' },
+    { name: 'Cooking', icon: '/placeholder.svg', handle: 'cooking' },
+    { name: 'Diabetic Food', icon: '/placeholder.svg', handle: 'diabetic-food' },
+    { name: 'Dish Detergents', icon: '/placeholder.svg', handle: 'dish-detergents' },
+    { name: 'Oil', icon: '/placeholder.svg', handle: 'oil' }
   ];
 
-  const popularProducts = [
-    { name: 'Green Apple', icon: '/placeholder.svg' },
-    { name: 'Orange', icon: '/placeholder.svg' },
-    { name: 'Green Cabbage', icon: '/placeholder.svg' },
-    { name: 'Green Lettuce', icon: '/placeholder.svg' },
-    { name: 'Eggplant', icon: '/placeholder.svg' },
-    { name: 'Eggplant', icon: '/placeholder.svg' },
-    { name: 'Big Potatoes', icon: '/placeholder.svg' },
-    { name: 'Egg', icon: '/placeholder.svg' },
-    { name: 'Fresh Cauliflower', icon: '/placeholder.svg' },
-    { name: 'Green Capsicum', icon: '/placeholder.svg' },
-    { name: 'Green Chilli', icon: '/placeholder.svg' },
-    { name: 'Pears', icon: '/placeholder.svg' }
+  const mainBanner = { 
+    title: 'Fresh & Healthy Organic Food', 
+    subtitle: 'Sale up to 30% off', 
+    buttonText: 'Shop Now', 
+    image: '/placeholder.svg' 
+  };
+  
+  const sideBanners = [
+    { title: '70% OFF', subtitle: 'Fresh Fruit & Vegetable', buttonText: 'Shop Now' },
+    { title: 'Special Products Deal of the Month', buttonText: 'Shop Now' }
   ];
 
   const banners = [
-    {
-      title: 'Sale of the Month',
-      subtitle: 'Best Deals',
-      link: '/search'
-    },
-    {
-      title: 'Low-Fat Meat',
-      subtitle: '25% Fat Free',
-      link: '/search'
-    },
-    {
-      title: '100% Fresh Fruit',
-      subtitle: 'Summer Sale',
-      link: '/search'
-    }
+    { title: 'Sale of the Month', badge: 'Best Dealer', buttonText: 'Shop Now' },
+    { title: 'Low-Fat Meat', badge: '25% Fat-Free', buttonText: 'Shop Now' },
+    { title: '100% Fresh Fruit', badge: 'Summer Sale', buttonText: 'Shop Now' }
   ];
-
-  const mainBanner = {
-    title: 'Fresh & Healthy Organic Food',
-    subtitle: 'Sale up to 30% off',
-    link: '/search'
-  };
-
-  const sideBanners = [
-    {
-      title: '70% OFF',
-      subtitle: 'Fresh Fruit & Vegetable',
-      link: '/search'
-    },
-    {
-      title: 'Special Products Deal of the Month',
-      subtitle: 'Shop Now',
-      link: '/search'
-    }
-  ];
+  // ------------------------------------------------------------------------------------------
 
   return (
     <>
       {/* Hero Section */}
       <section className="mx-auto grid max-w-screen-2xl gap-4 px-4 py-8 md:grid-cols-3">
-        {/* Banner Principal */}
-        <Link
-          href={mainBanner.link}
-          className="relative col-span-2 flex h-[500px] items-center overflow-hidden rounded-xl bg-gray-200"
-        >
-          <div
-            className="h-full w-full bg-cover bg-center"
-            style={{ backgroundImage: 'url(/placeholder.svg)' }}
-          ></div>
-          <div className="absolute top-1/2 left-10 -translate-y-1/2 transform text-black">
-            <h2 className="text-4xl font-bold">{mainBanner.title}</h2>
-            <p className="text-xl">{mainBanner.subtitle}</p>
-            <span className="mt-4 inline-block rounded-full bg-green-500 px-6 py-2 font-bold text-white">
-              Shop Now
-            </span>
-          </div>
-        </Link>
-        {/* Banners Laterales */}
-        <div className="col-span-1 flex flex-col gap-4">
-          <Link
-            href={sideBanners[0].link}
-            className="relative flex h-[240px] items-center overflow-hidden rounded-xl bg-gray-200"
-          >
-            <div
-              className="h-full w-full bg-cover bg-center"
-              style={{ backgroundImage: 'url(/placeholder.svg)' }}
-            ></div>
-            <div className="absolute top-1/2 left-5 -translate-y-1/2 transform text-black">
-              <h3 className="text-2xl font-bold">{sideBanners[0].title}</h3>
-              <p>{sideBanners[0].subtitle}</p>
-              <span className="mt-2 inline-block font-bold underline">Shop Now</span>
+        {/* Main Banner */}
+        <div className="relative col-span-2 h-[400px] rounded-xl bg-gray-200 p-8 flex flex-col justify-end dark:bg-gray-800">
+          <h1 className="text-5xl font-extrabold text-black dark:text-white z-10">{mainBanner.title}</h1>
+          <p className="text-xl text-gray-700 dark:text-gray-300 z-10">{mainBanner.subtitle}</p>
+          <button className="mt-4 px-6 py-3 bg-green-500 text-white font-bold rounded-lg w-fit z-10">
+            {mainBanner.buttonText}
+          </button>
+          <span className="absolute right-8 top-1/2 -translate-y-1/2 text-[100px] font-bold text-gray-400 opacity-20">Placeholder</span>
+        </div>
+
+        {/* Side Banners */}
+        <div className="flex flex-col gap-4">
+          {sideBanners.map((banner, index) => (
+            <div key={index} className="relative h-[192px] rounded-xl bg-gray-200 p-6 flex flex-col justify-end dark:bg-gray-800">
+              <h2 className="text-xl font-bold dark:text-white">{banner.title}</h2>
+              {banner.subtitle && <p className="text-sm dark:text-gray-300">{banner.subtitle}</p>}
+              <Link href="/search" className="text-sm text-green-500 font-medium mt-2">
+                {banner.buttonText}
+              </Link>
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-5xl font-bold text-gray-400 opacity-20">Placeholder</span>
             </div>
-          </Link>
-          <Link
-            href={sideBanners[1].link}
-            className="relative flex h-[240px] items-center overflow-hidden rounded-xl bg-gray-200"
-          >
-            <div
-              className="h-full w-full bg-cover bg-center"
-              style={{ backgroundImage: 'url(/placeholder.svg)' }}
-            ></div>
-            <div className="absolute top-1/2 left-5 -translate-y-1/2 transform text-black">
-              <h3 className="text-2xl font-bold">{sideBanners[1].title}</h3>
-              <p>{sideBanners[1].subtitle}</p>
-            </div>
-          </Link>
+          ))}
         </div>
       </section>
 
-      {/* Popular Categories */}
+      {/* Popular Categories (SECCIÓN DE CÍRCULOS) */}
       <section className="mx-auto max-w-screen-2xl px-4 py-8">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Popular Categories</h2>
+          <h2 className="text-2xl font-bold dark:text-white">Popular Categories</h2>
           <Link href="/search" className="text-sm text-green-500">
             View All →
           </Link>
         </div>
-        <Grid className="grid-cols-2 md:grid-cols-4 lg:grid-cols-6 mt-4">
-          {categories.map((category) => (
-            <Grid.Item
-              key={category.name}
-              className="flex flex-col items-center p-4"
+        <Grid className="grid-cols-4 md:grid-cols-6 lg:grid-cols-12 mt-4">
+          {categories.slice(0, 12).map((category, index) => (
+            <Link 
+              key={index} 
+              // Enlace a la página de búsqueda/colección de la categoría
+              href={`/search/${category.handle}`} 
+              className="flex flex-col items-center p-4 transition duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl"
             >
-              <div className="h-16 w-16 overflow-hidden rounded-full bg-gray-200">
-                <img src={category.icon} alt={category.name} className="h-full w-full object-cover" />
+              <div className="h-16 w-16 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                <span className="text-xs text-gray-500">Icon</span>
               </div>
-              <p className="mt-2 text-center text-sm font-medium">{category.name}</p>
-            </Grid.Item>
+              <p className="mt-2 text-center text-sm font-medium dark:text-white">{category.name}</p>
+            </Link>
           ))}
         </Grid>
       </section>
 
-      {/* Popular Products */}
+      {/* Popular Products (TARJETAS COMPLETAS RESTAURADAS) */}
       <section className="mx-auto max-w-screen-2xl px-4 py-8">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Popular Products</h2>
+          <h2 className="text-2xl font-bold dark:text-white">Popular Products</h2>
           <Link href="/search" className="text-sm text-green-500">
             View All →
           </Link>
         </div>
-        <Grid className="grid-cols-2 md:grid-cols-4 lg:grid-cols-6 mt-4">
-          {popularProducts.map((product) => (
-            <Grid.Item
-              key={product.name}
-              className="flex flex-col items-center p-4"
+        
+        {/* Grid para 3 columnas para las tarjetas grandes */}
+        <Grid className="grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mt-4 gap-4">
+          {popularProducts.slice(0, 12).map((product) => (
+            <Link 
+              key={product.handle} 
+              href={`/product/${product.handle}`} 
+              className="group relative rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-shadow duration-200 hover:shadow-lg dark:border-gray-700 dark:bg-gray-800"
+              prefetch={true}
             >
-              <div className="h-16 w-16 overflow-hidden rounded-full bg-gray-200">
-                <img src={product.icon} alt={product.name} className="h-full w-full object-cover" />
+              {/* Contenedor de la imagen (simulando el placeholder grande) */}
+              <div className="relative h-64 w-full overflow-hidden rounded-md bg-gray-100 dark:bg-gray-700">
+                <span className="absolute inset-0 flex items-center justify-center text-xl font-bold text-gray-400">Placeholder</span>
               </div>
-              <p className="mt-2 text-center text-sm font-medium">{product.name}</p>
-            </Grid.Item>
+
+              {/* Contenedor de información y botón */}
+              <div className="mt-3 flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-medium dark:text-white">{product.title}</h3>
+                  <p className="text-xl font-bold text-green-600 dark:text-green-500">
+                    {product.priceRange.minVariantPrice.amount} {product.priceRange.minVariantPrice.currencyCode}
+                  </p>
+                </div>
+                
+                {/* Simulación del botón de Add to Cart */}
+                <button 
+                  className="rounded-full bg-green-500 px-4 py-2 text-sm font-semibold text-white transition-colors duration-200 hover:bg-green-600"
+                  onClick={(e) => {
+                    e.preventDefault(); 
+                    e.stopPropagation();
+                    console.log(`Add to cart: ${product.title}`);
+                  }}
+                >
+                  Add to Cart
+                </button>
+              </div>
+            </Link>
           ))}
         </Grid>
       </section>
@@ -207,23 +163,13 @@ export default async function HomePage() {
       {/* Promotional Banners */}
       <section className="mx-auto grid max-w-screen-2xl gap-4 px-4 py-8 md:grid-cols-3">
         {banners.map((banner, index) => (
-          <Link
-            key={index}
-            href={banner.link}
-            className="relative flex h-60 items-center overflow-hidden rounded-xl bg-gray-200"
-          >
-            <div
-              className="h-full w-full bg-cover bg-center"
-              style={{ backgroundImage: 'url(/placeholder.svg)' }}
-            ></div>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform text-center text-black">
-              <h3 className="text-lg font-bold">{banner.title}</h3>
-              <p className="text-sm">{banner.subtitle}</p>
-              <span className="mt-2 inline-block rounded-full bg-white px-4 py-1 text-xs font-bold text-black">
-                Shop Now
-              </span>
-            </div>
-          </Link>
+          <div key={index} className="relative h-64 rounded-xl bg-gray-100 p-6 flex flex-col justify-end dark:bg-gray-800">
+            <h2 className="text-2xl font-bold dark:text-white">{banner.title}</h2>
+            <span className="text-sm text-green-600 font-semibold">{banner.badge}</span>
+            <button className="mt-3 px-4 py-2 text-sm bg-white text-black font-semibold rounded-lg w-fit">
+              {banner.buttonText}
+            </button>
+          </div>
         ))}
       </section>
     </>
