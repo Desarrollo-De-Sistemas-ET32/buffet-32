@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { Suspense } from 'react';
 
-import { getCollections } from 'lib/shopify';
+import { getCollections } from 'lib/store';
 import FilterList from './filter';
 
 async function CollectionList() {
@@ -10,8 +10,8 @@ async function CollectionList() {
 }
 
 const skeleton = 'mb-3 h-4 w-5/6 animate-pulse rounded-sm';
-const activeAndTitles = 'bg-neutral-800 dark:bg-neutral-300';
-const items = 'bg-neutral-400 dark:bg-neutral-700';
+const activeAndTitles = 'bg-[#2C742F]/70';
+const items = 'bg-[#84D187]/60';
 
 export default function Collections() {
   return (
