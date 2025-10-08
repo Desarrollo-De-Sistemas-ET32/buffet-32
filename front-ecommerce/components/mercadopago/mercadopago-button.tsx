@@ -1,31 +1,31 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
-import type { Cart, CartItem } from 'lib/shopify/types';
+import type { Cart } from 'lib/shopify/types';
 
 interface MercadoPagoButtonProps {
   cart: Cart;
+  guestInfo: { nombre: string; dni: string; };
 }
 
-const MercadoPagoButton = ({ cart }: MercadoPagoButtonProps) => {
+const MercadoPagoButton = ({ cart, guestInfo }: MercadoPagoButtonProps) => {
   const [preferenceId, setPreferenceId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Initialize Mercado Pago SDK on client side
   initMercadoPago(process.env.NEXT_PUBLIC_MP_PUBLIC_KEY!, { locale: 'es-AR' });
 
   const handlePayment = async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch('/api/mercadopago', {
+      const response = await fetch('/api/orders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ cart }),
+        body: JSON.stringify({ cart, guestInfo }),
       });
 
       if (!response.ok) {
@@ -43,7 +43,6 @@ const MercadoPagoButton = ({ cart }: MercadoPagoButtonProps) => {
     }
   };
 
-  // Si ya tenemos una preferencia, mostramos el botón de pago de Mercado Pago
   if (preferenceId) {
     return (
       <Wallet
@@ -53,12 +52,11 @@ const MercadoPagoButton = ({ cart }: MercadoPagoButtonProps) => {
     );
   }
 
-  // Si no, mostramos nuestro botón para crear la preferencia
   return (
     <div>
       <button
         onClick={handlePayment}
-        disabled={isLoading || cart.lines.length === 0} // Deshabilitar si está cargando o el carrito está vacío
+        disabled={isLoading || cart.lines.length === 0 || !guestInfo.nombre || !guestInfo.dni}
         className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isLoading ? 'Procesando...' : 'Pagar con Mercado Pago'}

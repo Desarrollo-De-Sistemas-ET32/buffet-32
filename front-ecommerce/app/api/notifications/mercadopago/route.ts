@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { MercadoPagoConfig, MerchantOrder } from 'mercadopago';
+import { MercadoPagoConfig, Payment } from 'mercadopago';
 import { db } from '@/lib/drizzle/db';
 import * as schema from '@/lib/drizzle/schema';
 import { eq } from 'drizzle-orm';
@@ -15,13 +15,13 @@ export async function POST(req: NextRequest) {
     const paymentId = body.data.id;
     
     try {
-      const merchantOrder = new MerchantOrder(client);
-      const orderInfo = await merchantOrder.get({
-        merchantOrderId: paymentId,
+      const payment = new Payment(client);
+      const paymentInfo = await payment.get({
+        id: paymentId,
       });
 
-      if (orderInfo && orderInfo.external_reference && orderInfo.order_status === 'paid') {
-        const orderId = parseInt(orderInfo.external_reference, 10);
+      if (paymentInfo && paymentInfo.external_reference && paymentInfo.status === 'approved') {
+        const orderId = parseInt(paymentInfo.external_reference, 10);
         
         await db
           .update(schema.ordenes)

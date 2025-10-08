@@ -26,9 +26,16 @@ export const clientes = pgTable('clientes', {
   puntos: integer('puntos').default(0),
 });
 
+export const huespedes = pgTable('huespedes', {
+  huesped_id: serial('huesped_id').primaryKey(),
+  nombre: varchar('nombre', { length: 255 }),
+  dni: varchar('dni', { length: 20 }),
+});
+
 export const ordenes = pgTable('ordenes', {
   orden_id: serial('orden_id').primaryKey(),
   cliente_id: integer('cliente_id').references(() => clientes.cliente_id),
+  huesped_id: integer('huesped_id').references(() => huespedes.huesped_id),
   fecha_orden: date('fecha_orden'),
   estado: varchar('estado', { length: 50 }),
 });
