@@ -1,4 +1,5 @@
 import Grid from 'components/grid';
+
 import ProductGridItems from 'components/layout/product-grid-items';
 import { getProducts } from 'lib/store';
 import Link from 'next/link';
@@ -12,64 +13,48 @@ export const metadata = {
 };
 
 export default async function HomePage() {
+  
+  // Cargar categorías y productos
+  const popularCategories = await getCollections();
+  const popularProducts = await getCollectionProducts({
+    collection: 'popular-products', 
+    sortKey: 'BEST_SELLING',
+    reverse: false
+  });
+
+  // --- Datos Mock de la Estructura de la Home ---
+  // NOTA: Usamos este array de categorías por simplicidad del mock y porque coincide con el layout de 12 círculos.
   const categories = [
-    { name: 'Fresh Fruit', icon: '/placeholder.svg' },
-    { name: 'Fresh Vegetables', icon: '/placeholder.svg' },
-    { name: 'Meat & Fish', icon: '/placeholder.svg' },
-    { name: 'Snacks', icon: '/placeholder.svg' },
-    { name: 'Beverages', icon: '/placeholder.svg' },
-    { name: 'Beauty & Health', icon: '/placeholder.svg' },
-    { name: 'Bread & Bakery', icon: '/placeholder.svg' },
-    { name: 'Baking Needs', icon: '/placeholder.svg' },
-    { name: 'Cooking', icon: '/placeholder.svg' },
-    { name: 'Diabetic Food', icon: '/placeholder.svg' },
-    { name: 'Dish Detergents', icon: '/placeholder.svg' },
-    { name: 'Oil', icon: '/placeholder.svg' }
+    { name: 'Fresh Fruit', icon: '/placeholder.svg', handle: 'fresh-fruit' },
+    { name: 'Fresh Vegetables', icon: '/placeholder.svg', handle: 'fresh-vegetables' },
+    { name: 'Meat & Fish', icon: '/placeholder.svg', handle: 'meat-fish' },
+    { name: 'Snacks', icon: '/placeholder.svg', handle: 'snacks' },
+    { name: 'Beverages', icon: '/placeholder.svg', handle: 'beverages' },
+    { name: 'Beauty & Health', icon: '/placeholder.svg', handle: 'beauty-health' },
+    { name: 'Bread & Bakery', icon: '/placeholder.svg', handle: 'bread-bakery' },
+    { name: 'Baking Needs', icon: '/placeholder.svg', handle: 'baking-needs' },
+    { name: 'Cooking', icon: '/placeholder.svg', handle: 'cooking' },
+    { name: 'Diabetic Food', icon: '/placeholder.svg', handle: 'diabetic-food' },
+    { name: 'Dish Detergents', icon: '/placeholder.svg', handle: 'dish-detergents' },
+    { name: 'Oil', icon: '/placeholder.svg', handle: 'oil' }
   ];
+
 
   const featuredProducts = (await getProducts({ sortKey: 'CREATED_AT', reverse: true })).slice(0, 8);
 
+
   const banners = [
-    {
-      title: 'Sale of the Month',
-      subtitle: 'Best Deals',
-      link: '/search'
-    },
-    {
-      title: 'Low-Fat Meat',
-      subtitle: '25% Fat Free',
-      link: '/search'
-    },
-    {
-      title: '100% Fresh Fruit',
-      subtitle: 'Summer Sale',
-      link: '/search'
-    }
+    { title: 'Sale of the Month', badge: 'Best Dealer', buttonText: 'Shop Now' },
+    { title: 'Low-Fat Meat', badge: '25% Fat-Free', buttonText: 'Shop Now' },
+    { title: '100% Fresh Fruit', badge: 'Summer Sale', buttonText: 'Shop Now' }
   ];
-
-  const mainBanner = {
-    title: 'Fresh & Healthy Organic Food',
-    subtitle: 'Sale up to 30% off',
-    link: '/search'
-  };
-
-  const sideBanners = [
-    {
-      title: '70% OFF',
-      subtitle: 'Fresh Fruit & Vegetable',
-      link: '/search'
-    },
-    {
-      title: 'Special Products Deal of the Month',
-      subtitle: 'Shop Now',
-      link: '/search'
-    }
-  ];
+  // ------------------------------------------------------------------------------------------
 
   return (
     <>
       {/* Hero Section */}
       <section className="mx-auto grid max-w-screen-2xl gap-4 px-4 py-8 md:grid-cols-3">
+
         {/* Banner Principal */}
         <Link
           href={mainBanner.link}
@@ -106,29 +91,31 @@ export default async function HomePage() {
               <h3 className="text-2xl font-bold">{sideBanners[1].title}</h3>
               <p>{sideBanners[1].subtitle}</p>
             </div>
-          </Link>
+          ))}
         </div>
       </section>
 
-      {/* Popular Categories */}
+      {/* Popular Categories (SECCIÓN DE CÍRCULOS) */}
       <section className="mx-auto max-w-screen-2xl px-4 py-8">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Popular Categories</h2>
-          <Link href="/search" className="text-sm text-[#2C742F] hover:text-[#00B207]">
+          <h2 className="text-2xl font-bold dark:text-white">Popular Categories</h2>
+          <Link href="/search" className="text-sm text-green-500">
             View All →
           </Link>
         </div>
-        <Grid className="grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-6 mt-4">
-          {categories.map((category) => (
-            <Grid.Item
-              key={category.name}
-              className="flex flex-col items-center rounded-xl border border-[#84D187]/70 bg-white p-4 shadow-sm"
+        <Grid className="grid-cols-4 md:grid-cols-6 lg:grid-cols-12 mt-4">
+          {categories.slice(0, 12).map((category, index) => (
+            <Link 
+              key={index} 
+              // Enlace a la página de búsqueda/colección de la categoría
+              href={`/search/${category.handle}`} 
+              className="flex flex-col items-center p-4 transition duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl"
             >
-              <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-[#84D187]/40">
-                <img src={category.icon} alt={category.name} className="h-full w-full object-cover" />
+              <div className="h-16 w-16 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                <span className="text-xs text-gray-500">Icon</span>
               </div>
-              <p className="mt-2 text-center text-sm font-medium">{category.name}</p>
-            </Grid.Item>
+              <p className="mt-2 text-center text-sm font-medium dark:text-white">{category.name}</p>
+            </Link>
           ))}
         </Grid>
       </section>
@@ -153,23 +140,13 @@ export default async function HomePage() {
       {/* Promotional Banners */}
       <section className="mx-auto grid max-w-screen-2xl gap-4 px-4 py-8 md:grid-cols-3">
         {banners.map((banner, index) => (
-          <Link
-            key={index}
-            href={banner.link}
-            className="relative flex h-60 items-center overflow-hidden rounded-xl bg-gray-200"
-          >
-            <div
-              className="h-full w-full bg-cover bg-center"
-              style={{ backgroundImage: 'url(/placeholder.svg)' }}
-            ></div>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform text-center text-black">
-              <h3 className="text-lg font-bold">{banner.title}</h3>
-              <p className="text-sm">{banner.subtitle}</p>
-              <span className="mt-2 inline-block rounded-full bg-white px-4 py-1 text-xs font-bold text-black">
-                Shop Now
-              </span>
-            </div>
-          </Link>
+          <div key={index} className="relative h-64 rounded-xl bg-gray-100 p-6 flex flex-col justify-end dark:bg-gray-800">
+            <h2 className="text-2xl font-bold dark:text-white">{banner.title}</h2>
+            <span className="text-sm text-green-600 font-semibold">{banner.badge}</span>
+            <button className="mt-3 px-4 py-2 text-sm bg-white text-black font-semibold rounded-lg w-fit">
+              {banner.buttonText}
+            </button>
+          </div>
         ))}
       </section>
     </>
