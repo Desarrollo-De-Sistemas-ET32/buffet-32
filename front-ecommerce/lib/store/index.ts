@@ -632,13 +632,7 @@ export async function getCollections(): Promise<Collection[]> {
 }
 
 export async function getMenu(_handle: string): Promise<Menu[]> {
-  const { categoryCollections } = await buildCatalog();
-  const categoryLinks: Menu[] = Array.from(categoryCollections.values()).slice(0, 4).map((collection) => ({
-    title: collection.title,
-    path: collection.path
-  }));
-
-  return [...FALLBACK_MENU, ...categoryLinks];
+  return [];
 }
 
 export async function getPage(handle: string): Promise<Page> {
