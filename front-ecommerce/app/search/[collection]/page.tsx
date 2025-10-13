@@ -1,4 +1,4 @@
-import { getCollection, getCollectionProducts } from 'lib/store';
+import { getCollection, getCollectionProducts } from 'lib/shop-mock';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 

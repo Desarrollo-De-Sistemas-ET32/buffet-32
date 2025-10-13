@@ -1,5 +1,5 @@
-import { getCollections, getPages, getProducts } from 'lib/store';
 import { baseUrl } from 'lib/utils';
+import { getCollection, getCollectionProducts, getProducts } from 'lib/shop-mock';
 import { MetadataRoute } from 'next';
 
 type Route = {
@@ -10,18 +10,10 @@ type Route = {
 export const dynamic = 'force-dynamic';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-
   const routesMap = [''].map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date().toISOString()
   }));
-
-  const collectionsPromise = getCollections().then((collections) =>
-    collections.map((collection) => ({
-      url: `${baseUrl}${collection.path}`,
-      lastModified: collection.updatedAt
-    }))
-  );
 
   const productsPromise = getProducts({}).then((products) =>
     products.map((product) => ({
@@ -30,21 +22,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
   );
 
-  const pagesPromise = getPages().then((pages) =>
-    pages.map((page) => ({
-      url: `${baseUrl}/${page.handle}`,
-      lastModified: page.updatedAt
-    }))
-  );
-
   let fetchedRoutes: Route[] = [];
-
   try {
-    fetchedRoutes = (
-      await Promise.all([collectionsPromise, productsPromise, pagesPromise])
+    // We can add a couple of mock collections
+    const collections = ['hidden-homepage-featured-items', 'hidden-homepage-carousel'];
+    const collectionRoutes: Route[] = (
+      await Promise.all(
+        collections.map(async (c) => {
+          const col = await getCollection(c);
+          return { url: `${baseUrl}${col?.path || '/search'}`, lastModified: col?.updatedAt || new Date().toISOString() } as Route;
+        })
+      )
     ).flat();
-  } catch (error) {
-    throw JSON.stringify(error, null, 2);
+    const productRoutes = await productsPromise;
+    fetchedRoutes = [...collectionRoutes, ...productRoutes];
+  } catch {
+    fetchedRoutes = [];
   }
 
   return [...routesMap, ...fetchedRoutes];

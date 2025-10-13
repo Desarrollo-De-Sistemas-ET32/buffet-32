@@ -1,14 +1,12 @@
 import type { Metadata } from 'next';
-
 import Prose from 'components/prose';
-import { getPage } from 'lib/store';
 import { notFound } from 'next/navigation';
 
 export async function generateMetadata(props: {
   params: Promise<{ page: string }>;
 }): Promise<Metadata> {
   const params = await props.params;
-  const page = await getPage(params.page);
+  const page = mockGetPage(params.page);
 
   if (!page) return notFound();
 
@@ -25,7 +23,7 @@ export async function generateMetadata(props: {
 
 export default async function Page(props: { params: Promise<{ page: string }> }) {
   const params = await props.params;
-  const page = await getPage(params.page);
+  const page = mockGetPage(params.page);
 
   if (!page) return notFound();
 
@@ -42,4 +40,17 @@ export default async function Page(props: { params: Promise<{ page: string }> })
       </p>
     </>
   );
+}
+
+function mockGetPage(handle: string) {
+  return {
+    id: handle,
+    title: handle,
+    handle,
+    body: `<p>Mock page for ${handle}</p>`,
+    bodySummary: `Mock page for ${handle}`,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    seo: { title: handle, description: `Mock page for ${handle}` }
+  };
 }

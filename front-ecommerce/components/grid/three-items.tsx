@@ -1,6 +1,6 @@
 import { GridTileImage } from 'components/grid/tile';
-import { getCollectionProducts } from 'lib/store';
-import type { Product } from 'lib/store/types';
+import { getCollectionProducts } from 'lib/shop-mock';
+import type { Product } from 'lib/shopify/types';
 import Link from 'next/link';
 
 function ThreeItemGridItem({
@@ -43,9 +43,15 @@ function ThreeItemGridItem({
 
 export async function ThreeItemGrid() {
   // Collections that start with `hidden-*` are hidden from the search page.
-  const homepageItems = await getCollectionProducts({
-    collection: 'hidden-homepage-featured-items'
-  });
+  let homepageItems: Product[] = [];
+  try {
+    homepageItems = await getCollectionProducts({
+      collection: 'hidden-homepage-featured-items'
+    });
+  } catch {
+    // If provider is unavailable, hide this section
+    return null;
+  }
 
   if (!homepageItems[0] || !homepageItems[1] || !homepageItems[2]) return null;
 

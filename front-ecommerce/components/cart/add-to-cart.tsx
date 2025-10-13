@@ -70,10 +70,14 @@ export function AddToCart({ product }: { product: Product }) {
   );
   const defaultVariantId = variants.length === 1 ? variants[0]?.id : undefined;
   const selectedVariantId = variant?.id || defaultVariantId;
-  const addItemAction = formAction.bind(null, selectedVariantId);
   const finalVariant = variants.find(
     (variant) => variant.id === selectedVariantId
   )!;
+  // Send full snapshot to server action so we can store in cookie without Shopify
+  const addItemPayload = selectedVariantId
+    ? { variant: finalVariant, product }
+    : undefined;
+  const addItemAction = formAction.bind(null, addItemPayload);
 
   return (
     <form
