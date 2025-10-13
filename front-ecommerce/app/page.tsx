@@ -1,7 +1,8 @@
 import Grid from 'components/grid';
-import Link from 'next/link'; 
-import { getCollectionProducts, getCollections } from 'lib/shopify'; 
-import type { Product } from 'lib/shopify/types';
+
+import ProductGridItems from 'components/layout/product-grid-items';
+import { getProducts } from 'lib/store';
+import Link from 'next/link';
 
 export const metadata = {
   description:
@@ -38,17 +39,9 @@ export default async function HomePage() {
     { name: 'Oil', icon: '/placeholder.svg', handle: 'oil' }
   ];
 
-  const mainBanner = { 
-    title: 'Fresh & Healthy Organic Food', 
-    subtitle: 'Sale up to 30% off', 
-    buttonText: 'Shop Now', 
-    image: '/placeholder.svg' 
-  };
-  
-  const sideBanners = [
-    { title: '70% OFF', subtitle: 'Fresh Fruit & Vegetable', buttonText: 'Shop Now' },
-    { title: 'Special Products Deal of the Month', buttonText: 'Shop Now' }
-  ];
+
+  const featuredProducts = (await getProducts({ sortKey: 'CREATED_AT', reverse: true })).slice(0, 8);
+
 
   const banners = [
     { title: 'Sale of the Month', badge: 'Best Dealer', buttonText: 'Shop Now' },
@@ -61,26 +54,42 @@ export default async function HomePage() {
     <>
       {/* Hero Section */}
       <section className="mx-auto grid max-w-screen-2xl gap-4 px-4 py-8 md:grid-cols-3">
-        {/* Main Banner */}
-        <div className="relative col-span-2 h-[400px] rounded-xl bg-gray-200 p-8 flex flex-col justify-end dark:bg-gray-800">
-          <h1 className="text-5xl font-extrabold text-black dark:text-white z-10">{mainBanner.title}</h1>
-          <p className="text-xl text-gray-700 dark:text-gray-300 z-10">{mainBanner.subtitle}</p>
-          <button className="mt-4 px-6 py-3 bg-green-500 text-white font-bold rounded-lg w-fit z-10">
-            {mainBanner.buttonText}
-          </button>
-          <span className="absolute right-8 top-1/2 -translate-y-1/2 text-[100px] font-bold text-gray-400 opacity-20">Placeholder</span>
-        </div>
 
-        {/* Side Banners */}
-        <div className="flex flex-col gap-4">
-          {sideBanners.map((banner, index) => (
-            <div key={index} className="relative h-[192px] rounded-xl bg-gray-200 p-6 flex flex-col justify-end dark:bg-gray-800">
-              <h2 className="text-xl font-bold dark:text-white">{banner.title}</h2>
-              {banner.subtitle && <p className="text-sm dark:text-gray-300">{banner.subtitle}</p>}
-              <Link href="/search" className="text-sm text-green-500 font-medium mt-2">
-                {banner.buttonText}
-              </Link>
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-5xl font-bold text-gray-400 opacity-20">Placeholder</span>
+        {/* Banner Principal */}
+        <Link
+          href={mainBanner.link}
+          className="relative col-span-2 flex h-[500px] items-center overflow-hidden rounded-xl bg-[#84D187]"
+        >
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.45),_transparent)]" />
+          <div className="relative z-10 top-1/2 left-10 -translate-y-1/2 transform text-[#2C742F]">
+            <h2 className="text-4xl font-bold">{mainBanner.title}</h2>
+            <p className="text-xl">{mainBanner.subtitle}</p>
+            <span className="mt-4 inline-block rounded-full bg-[#00B207] px-6 py-2 font-bold text-white">
+              Shop Now
+            </span>
+          </div>
+        </Link>
+        {/* Banners Laterales */}
+        <div className="col-span-1 flex flex-col gap-4">
+          <Link
+            href={sideBanners[0].link}
+            className="relative flex h-[240px] items-center overflow-hidden rounded-xl bg-[#00B207] text-white"
+          >
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(132,209,135,0.6),_transparent)]" />
+            <div className="relative z-10 top-1/2 left-5 -translate-y-1/2 transform">
+              <h3 className="text-2xl font-bold">{sideBanners[0].title}</h3>
+              <p>{sideBanners[0].subtitle}</p>
+              <span className="mt-2 inline-block font-bold underline decoration-white/70">Shop Now</span>
+            </div>
+          </Link>
+          <Link
+            href={sideBanners[1].link}
+            className="relative flex h-[240px] items-center overflow-hidden rounded-xl bg-[#84D187] text-[#2C742F]"
+          >
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,_rgba(44,116,47,0.15),_transparent)]" />
+            <div className="relative z-10 top-1/2 left-5 -translate-y-1/2 transform">
+              <h3 className="text-2xl font-bold">{sideBanners[1].title}</h3>
+              <p>{sideBanners[1].subtitle}</p>
             </div>
           ))}
         </div>
@@ -111,53 +120,21 @@ export default async function HomePage() {
         </Grid>
       </section>
 
-      {/* Popular Products (TARJETAS COMPLETAS RESTAURADAS) */}
+      {/* Featured Products */}
       <section className="mx-auto max-w-screen-2xl px-4 py-8">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold dark:text-white">Popular Products</h2>
-          <Link href="/search" className="text-sm text-green-500">
+          <h2 className="text-2xl font-bold">Featured Products</h2>
+          <Link href="/search" className="text-sm text-[#2C742F] hover:text-[#00B207]">
             View All →
           </Link>
         </div>
-        
-        {/* Grid para 3 columnas para las tarjetas grandes */}
-        <Grid className="grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mt-4 gap-4">
-          {popularProducts.slice(0, 12).map((product) => (
-            <Link 
-              key={product.handle} 
-              href={`/product/${product.handle}`} 
-              className="group relative rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-shadow duration-200 hover:shadow-lg dark:border-gray-700 dark:bg-gray-800"
-              prefetch={true}
-            >
-              {/* Contenedor de la imagen (simulando el placeholder grande) */}
-              <div className="relative h-64 w-full overflow-hidden rounded-md bg-gray-100 dark:bg-gray-700">
-                <span className="absolute inset-0 flex items-center justify-center text-xl font-bold text-gray-400">Placeholder</span>
-              </div>
-
-              {/* Contenedor de información y botón */}
-              <div className="mt-3 flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-medium dark:text-white">{product.title}</h3>
-                  <p className="text-xl font-bold text-green-600 dark:text-green-500">
-                    {product.priceRange.minVariantPrice.amount} {product.priceRange.minVariantPrice.currencyCode}
-                  </p>
-                </div>
-                
-                {/* Simulación del botón de Add to Cart */}
-                <button 
-                  className="rounded-full bg-green-500 px-4 py-2 text-sm font-semibold text-white transition-colors duration-200 hover:bg-green-600"
-                  onClick={(e) => {
-                    e.preventDefault(); 
-                    e.stopPropagation();
-                    console.log(`Add to cart: ${product.title}`);
-                  }}
-                >
-                  Add to Cart
-                </button>
-              </div>
-            </Link>
-          ))}
-        </Grid>
+        {featuredProducts.length ? (
+          <Grid className="grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 mt-4">
+            <ProductGridItems products={featuredProducts} />
+          </Grid>
+        ) : (
+          <p className="mt-4 text-neutral-500">Products are loading, please check back soon.</p>
+        )}
       </section>
       
       {/* Promotional Banners */}

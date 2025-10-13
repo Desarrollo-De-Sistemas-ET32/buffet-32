@@ -7,7 +7,7 @@ import {
   getCart,
   removeFromCart,
   updateCart
-} from 'lib/shopify';
+} from 'lib/store';
 import { revalidateTag } from 'next/cache';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
