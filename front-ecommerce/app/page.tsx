@@ -13,14 +13,13 @@ export const metadata = {
 };
 
 export default async function HomePage() {
-  
   // Cargar categorías y productos
-  const popularCategories = await getCollections();
-  const popularProducts = await getCollectionProducts({
-    collection: 'popular-products', 
-    sortKey: 'BEST_SELLING',
-    reverse: false
-  });
+  // const popularCategories = await getCollections();
+  // const popularProducts = await getCollectionProducts({
+  //   collection: 'popular-products',
+  //   sortKey: 'BEST_SELLING',
+  //   reverse: false
+  // });
 
   // --- Datos Mock de la Estructura de la Home ---
   // NOTA: Usamos este array de categorías por simplicidad del mock y porque coincide con el layout de 12 círculos.
@@ -39,14 +38,31 @@ export default async function HomePage() {
     { name: 'Oil', icon: '/placeholder.svg', handle: 'oil' }
   ];
 
-
   const featuredProducts = (await getProducts({ sortKey: 'CREATED_AT', reverse: true })).slice(0, 8);
-
 
   const banners = [
     { title: 'Sale of the Month', badge: 'Best Dealer', buttonText: 'Shop Now' },
     { title: 'Low-Fat Meat', badge: '25% Fat-Free', buttonText: 'Shop Now' },
     { title: '100% Fresh Fruit', badge: 'Summer Sale', buttonText: 'Shop Now' }
+  ];
+
+  const mainBanner = {
+    title: 'Fresh Vegetables',
+    subtitle: 'Up to 25% Off',
+    link: '/search/vegetables'
+  };
+
+  const sideBanners = [
+    {
+      title: 'Summer Sale',
+      subtitle: '70% Off',
+      link: '/search/summer-sale'
+    },
+    {
+      title: 'Fresh Fruit',
+      subtitle: 'Up to 50% Off',
+      link: '/search/fruits'
+    }
   ];
   // ------------------------------------------------------------------------------------------
 
@@ -54,7 +70,6 @@ export default async function HomePage() {
     <>
       {/* Hero Section */}
       <section className="mx-auto grid max-w-screen-2xl gap-4 px-4 py-8 md:grid-cols-3">
-
         {/* Banner Principal */}
         <Link
           href={mainBanner.link}
@@ -91,7 +106,7 @@ export default async function HomePage() {
               <h3 className="text-2xl font-bold">{sideBanners[1].title}</h3>
               <p>{sideBanners[1].subtitle}</p>
             </div>
-          ))}
+          </Link>
         </div>
       </section>
 
