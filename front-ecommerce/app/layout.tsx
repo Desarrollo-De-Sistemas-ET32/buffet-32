@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import { CartProvider } from 'components/cart/cart-context';
 import { Navbar } from 'components/layout/navbar';
 import { WelcomeToast } from 'components/welcome-toast';
@@ -7,21 +8,31 @@ import { ReactNode } from 'react';
 import { Toaster } from 'sonner';
 import './globals.css';
 import { baseUrl } from 'lib/utils';
+=======
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
+import Providers from "./providers";
+import { Toaster } from "sonner";
+import { SpeedInsights } from "@vercel/speed-insights/next"
+>>>>>>> Stashed changes
 
-const { SITE_NAME } = process.env;
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
 
-export const metadata = {
-  metadataBase: new URL(baseUrl),
-  title: {
-    default: SITE_NAME!,
-    template: `%s | ${SITE_NAME}`
-  },
-  robots: {
-    follow: true,
-    index: true
-  }
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+export const metadata: Metadata = {
+  title: "Nuts E-commerce",
+  description: "Your premium nuts store",
 };
 
+<<<<<<< Updated upstream
 export default async function RootLayout({
   children
 }: {
@@ -41,6 +52,26 @@ export default async function RootLayout({
             <WelcomeToast />
           </main>
         </CartProvider>
+=======
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <Providers>{children}</Providers>
+        <Toaster 
+        style={{
+          backgroundColor: 'red',
+          color: 'black',
+        }}
+        position="bottom-center" />
+        <SpeedInsights />
+>>>>>>> Stashed changes
       </body>
     </html>
   );
